@@ -1,0 +1,6 @@
+@InccApi_HostAddress = http://localhost:5140
+
+GET {{InccApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
