@@ -1,4 +1,6 @@
-﻿using InccApi.Models;
+﻿using InccApi.DTOs;
+using InccApi.DTOs.Mappings;
+using InccApi.Models;
 using InccApi.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,15 +19,17 @@ public class InccController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<InccEntry>>> Get()
+    public async Task<ActionResult<IEnumerable<InccResponseDTO>>> Get()
     {
         var inccEntries = await _inccRepository.GetAllAsync();
 
-        if (inccEntries is null)
+        if (inccEntries is null || !inccEntries.Any())
         {
             return NotFound();
         }
 
-        return Ok(inccEntries);
+        var inccEntriesResponseDto = inccEntries.ToDto();
+
+        return Ok(inccEntriesResponseDto);
     }
 }
