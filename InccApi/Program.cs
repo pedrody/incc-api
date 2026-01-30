@@ -1,4 +1,5 @@
 using InccApi.Context;
+using InccApi.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,8 @@ builder.Services.AddOpenApi();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseNpgsql(connectionString));
+
+builder.Services.AddScoped<IInccRepository, InccRepository>();
 
 var app = builder.Build();
 
