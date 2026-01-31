@@ -6,4 +6,5 @@ public interface IInccRepository
 {
     Task<IEnumerable<InccEntry>> GetAllAsync();
     Task<InccEntry?> GetByDateAsync(int year, int month);
+    Task<IEnumerable<InccEntry?>> GetRangeAsync(DateTime startDate, DateTime? endDate);
 }

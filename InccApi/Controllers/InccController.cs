@@ -48,4 +48,28 @@ public class InccController : ControllerBase
         return Ok(inccEntryResponseDto);
     }
 
+    [HttpGet("range")]
+    public async Task<ActionResult<IEnumerable<InccResponseDTO>>> Get([FromQuery] InccFilter filter)
+    {
+        var start = filter.GetStartDate();
+
+        if (start == null)
+        {
+            return BadRequest("Data inicial inválida");
+        }
+
+        if (!filter.IsValid())
+        {
+            return BadRequest("A data inicial não pode ser superior à final.");
+        }
+
+        var entries = await _inccRepository.GetRangeAsync(start.Value, filter.GetEndDate());
+
+        if (entries == null || !entries.Any())
+        {
+            return NotFound();
+        }
+
+        return Ok(entries.ToDtoList());
+    }
 }

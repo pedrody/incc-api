@@ -28,4 +28,16 @@ public class InccRepository : IInccRepository
             e.ReferenceDate == date
         );
     }
+
+    public async Task<IEnumerable<InccEntry?>> GetRangeAsync(DateTime startDate, DateTime? endDate)
+    {
+        var query = _context.InccEntries.Where(e => e.ReferenceDate >= startDate);
+
+        if (endDate.HasValue)
+        {
+            query = query.Where(e => e.ReferenceDate <= endDate.Value);
+        }
+
+        return await query.OrderBy(e => e.ReferenceDate).ToListAsync();
+    }
 }
