@@ -4,14 +4,17 @@ namespace InccApi.DTOs.Mappings;
 
 public static class InccDTOExtesions
 {
-    public static IEnumerable<InccResponseDTO> ToDto(this IEnumerable<InccEntry> inccEntries)
+    public static IEnumerable<InccResponseDTO> ToDtoList(this IEnumerable<InccEntry> inccEntries)
     {
-        var inccEntriesResponseDto = inccEntries.Select(e => new InccResponseDTO
-        {
-            MonthYear = e.ReferenceDate.ToString("MM/yyyy"),
-            Value = e.Value
-        }).ToList() ;
+        return inccEntries.Select(e => e.ToDto()).ToList();
+    }
 
-        return inccEntriesResponseDto;
+    public static InccResponseDTO ToDto(this InccEntry inccEntry)
+    {
+        return new InccResponseDTO
+        {
+            MonthYear = inccEntry.ReferenceDate.ToString("MM/yyyy"),
+            Value = inccEntry.Value
+        };
     }
 }

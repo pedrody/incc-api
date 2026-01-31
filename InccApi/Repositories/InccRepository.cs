@@ -19,4 +19,13 @@ public class InccRepository : IInccRepository
             .OrderBy(i => i.ReferenceDate)
             .ToListAsync();
     }
+
+    public async Task<InccEntry?> GetByDateAsync(int year, int month)
+    {
+        var date = new DateTime(year, month, 1);
+
+        return await _context.InccEntries.FirstOrDefaultAsync(e =>
+            e.ReferenceDate == date
+        );
+    }
 }

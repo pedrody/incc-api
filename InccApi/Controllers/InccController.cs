@@ -28,8 +28,24 @@ public class InccController : ControllerBase
             return NotFound();
         }
 
-        var inccEntriesResponseDto = inccEntries.ToDto();
+        var inccEntriesResponseDto = inccEntries.ToDtoList();
 
         return Ok(inccEntriesResponseDto);
     }
+
+    [HttpGet("{year:int:range(1995,2100)}/{month:int:range(1,12)}")]
+    public async Task<ActionResult<InccResponseDTO>> Get(int year, int month)
+    {
+        var inccEntry = await _inccRepository.GetByDateAsync(year, month);
+
+        if (inccEntry is null)
+        {
+            return NotFound();
+        }
+
+        var inccEntryResponseDto = inccEntry.ToDto();
+
+        return Ok(inccEntryResponseDto);
+    }
+
 }
