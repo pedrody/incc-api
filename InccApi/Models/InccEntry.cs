@@ -17,4 +17,7 @@ public class InccEntry
     [Range(0.0001, double.MaxValue)]
     [Column(TypeName = "decimal(18,4)")]
     public decimal Value { get; set; }
+
+    [Required]
+    public double MonthlyVariation { get; set; }
 }
