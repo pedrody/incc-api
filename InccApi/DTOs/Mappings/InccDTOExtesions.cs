@@ -14,7 +14,8 @@ public static class InccDTOExtesions
         return new InccResponseDTO
         {
             MonthYear = inccEntry.ReferenceDate.ToString("MM/yyyy"),
-            Value = inccEntry.Value
+            Value = inccEntry.Value,
+            MonthlyVariation = inccEntry.MonthlyVariation
         };
     }
 }
