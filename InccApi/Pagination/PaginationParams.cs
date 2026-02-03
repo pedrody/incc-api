@@ -3,10 +3,15 @@
 public class PaginationParams
 {
     private const int MaxPageSize = 60;
+    private const int DefaultPageSize = 12;
+    
     public int PageNumber { get; set; } = 1;
+
+    private int _pageSize = DefaultPageSize; 
+    
     public int PageSize
     {
-        get => field;
-        set => field = (value > MaxPageSize) ? MaxPageSize : value;
+        get => _pageSize;
+        set => _pageSize = (value <= 0) ? DefaultPageSize : (value > MaxPageSize ? MaxPageSize : value);
     }
 }
