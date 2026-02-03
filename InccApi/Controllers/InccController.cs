@@ -1,6 +1,7 @@
 ﻿using InccApi.DTOs;
 using InccApi.DTOs.Mappings;
 using InccApi.Models;
+using InccApi.Pagination;
 using InccApi.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,18 +20,20 @@ public class InccController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<InccResponseDTO>>> Get()
+    public async Task<ActionResult<IEnumerable<InccResponseDTO>>> GetPaginated(
+        [FromQuery] PaginationParams paginationParams)
     {
-        var inccEntries = await _inccRepository.GetAllAsync();
+        var (items, totalCount) = await _inccRepository.GetPaginatedAsync(paginationParams);
 
-        if (inccEntries is null || !inccEntries.Any())
+        var response = new InccPagedResponseDTO<InccResponseDTO>
         {
-            return NotFound();
-        }
+            Items = items.ToDtoList(),
+            CurrentPage = paginationParams.PageNumber,
+            TotalPages = (int)Math.Ceiling((double)totalCount / paginationParams.PageSize),
+            TotalItems = totalCount
+        };
 
-        var inccEntriesResponseDto = inccEntries.ToDtoList();
-
-        return Ok(inccEntriesResponseDto);
+        return Ok(response);
     }
 
     [HttpGet("{year:int:range(1995,2100)}/{month:int:range(1,12)}")]

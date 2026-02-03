@@ -1,5 +1,6 @@
 ﻿using InccApi.Context;
 using InccApi.Models;
+using InccApi.Pagination;
 using Microsoft.EntityFrameworkCore;
 
 namespace InccApi.Repositories;
@@ -13,11 +14,17 @@ public class InccRepository : IInccRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<InccEntry>> GetAllAsync()
+    public async Task<(IEnumerable<InccEntry> items, int totalCount)> GetPaginatedAsync(PaginationParams paginationParams)
     {
-        return await _context.InccEntries
-            .OrderBy(i => i.ReferenceDate)
+        var query = _context.InccEntries.AsNoTracking().OrderBy(e => e.ReferenceDate);
+
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .Skip((paginationParams.PageNumber - 1) * paginationParams.PageSize)
+            .Take(paginationParams.PageSize)
             .ToListAsync();
+
+        return (items, totalCount);
     }
 
     public async Task<InccEntry?> GetByDateAsync(int year, int month)
