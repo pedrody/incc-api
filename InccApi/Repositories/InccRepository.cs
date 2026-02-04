@@ -14,17 +14,11 @@ public class InccRepository : IInccRepository
         _context = context;
     }
 
-    public async Task<(IEnumerable<InccEntry> items, int totalCount)> GetPaginatedAsync(PaginationParams paginationParams)
+    public async Task<PagedList<InccEntry>> GetPaginatedAsync(PaginationParams paginationParams)
     {
         var query = _context.InccEntries.AsNoTracking().OrderBy(e => e.ReferenceDate);
 
-        var totalCount = await query.CountAsync();
-        var items = await query
-            .Skip((paginationParams.PageNumber - 1) * paginationParams.PageSize)
-            .Take(paginationParams.PageSize)
-            .ToListAsync();
-
-        return (items, totalCount);
+        return await PagedList<InccEntry>.ToPagedListAsync(query, paginationParams.PageNumber, paginationParams.PageSize);
     }
 
     public async Task<InccEntry?> GetByDateAsync(int year, int month)
