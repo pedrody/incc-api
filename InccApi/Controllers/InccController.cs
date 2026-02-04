@@ -54,7 +54,8 @@ public class InccController : ControllerBase
     }
 
     [HttpGet("range")]
-    public async Task<ActionResult<IEnumerable<InccResponseDTO>>> Get([FromQuery] InccFilter filter)
+    public async Task<ActionResult<IEnumerable<InccResponseDTO>>> Get(
+        [FromQuery] InccFilter filter)
     {
         var start = filter.GetStartDate();
 
@@ -68,12 +69,21 @@ public class InccController : ControllerBase
             return BadRequest("A data inicial não pode ser superior à final.");
         }
 
-        var entries = await _inccRepository.GetRangeAsync(start.Value, filter.GetEndDate());
+        var entries = await _inccRepository.GetRangeAsync(filter, start.Value, filter.GetEndDate());
 
         if (entries == null || !entries.Any())
         {
             return NotFound();
         }
+
+        Response.AddPaginationHeader(
+            entries.CurrentPage,
+            entries.PageSize,
+            entries.TotalCount,
+            entries.TotalPages,
+            entries.HasNext,
+            entries.HasPrevious
+        );
 
         return Ok(entries.ToDtoList());
     }

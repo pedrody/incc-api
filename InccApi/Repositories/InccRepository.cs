@@ -30,7 +30,9 @@ public class InccRepository : IInccRepository
         );
     }
 
-    public async Task<IEnumerable<InccEntry?>> GetRangeAsync(DateTime startDate, DateTime? endDate)
+    public async Task<PagedList<InccEntry>> GetRangeAsync(
+        PaginationParams @params,
+        DateTime startDate, DateTime? endDate)
     {
         var query = _context.InccEntries.Where(e => e.ReferenceDate >= startDate);
 
@@ -39,6 +41,7 @@ public class InccRepository : IInccRepository
             query = query.Where(e => e.ReferenceDate <= endDate.Value);
         }
 
-        return await query.OrderBy(e => e.ReferenceDate).ToListAsync();
+        return await PagedList<InccEntry>.ToPagedListAsync(query.OrderBy(e => e.ReferenceDate), 
+                                                           @params.PageNumber, @params.PageSize);
     }
 }
