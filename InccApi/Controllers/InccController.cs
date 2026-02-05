@@ -1,9 +1,9 @@
 ﻿using InccApi.DTOs;
 using InccApi.DTOs.Mappings;
 using InccApi.Extensions;
-using InccApi.Models;
 using InccApi.Pagination;
 using InccApi.Repositories;
+using InccApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InccApi.Controllers;
@@ -14,10 +14,12 @@ namespace InccApi.Controllers;
 public class InccController : ControllerBase
 {
     private readonly IInccRepository _inccRepository;
+    private readonly IInccService _inccService;
 
-    public InccController(IInccRepository inccRepository)
+    public InccController(IInccRepository inccRepository, IInccService inccService)
     {
         _inccRepository = inccRepository;
+        _inccService = inccService;
     }
 
     [HttpGet]
@@ -86,5 +88,24 @@ public class InccController : ControllerBase
         );
 
         return Ok(entries.ToDtoList());
+    }
+
+    [HttpGet("accumulated")]
+    public async Task<ActionResult<InccAccumulatedResponseDTO>> Get(
+        [FromQuery] InccAccumulatedParams @params)
+    {
+        if (!@params.IsValid())
+        {
+            return BadRequest("A data inicial não pode ser superior à final");
+        }
+
+        var accumulatedDto = await _inccService.AccumulatedVariationAsync(@params);
+
+        if (accumulatedDto == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(accumulatedDto);
     }
 }
