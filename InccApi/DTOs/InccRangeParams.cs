@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace InccApi.DTOs;
 
-public class InccFilter : PaginationParams
+public class InccRangeParams : PaginationParams
 {
     [Required(ErrorMessage = "Necessário informar o ano de início")]
     [Range(1995, 2100)]
