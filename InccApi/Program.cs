@@ -1,4 +1,5 @@
 using InccApi.Context;
+using InccApi.Middlewares;
 using InccApi.Repositories;
 using InccApi.Services;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,9 @@ builder.Services.AddScoped<IInccService, InccService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
