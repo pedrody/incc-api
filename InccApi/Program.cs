@@ -3,10 +3,19 @@ using InccApi.Middlewares;
 using InccApi.Repositories;
 using InccApi.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.AzureAppServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Logging.AddAzureWebAppDiagnostics();
+builder.Services.Configure<AzureFileLoggerOptions>(options =>
+{
+    options.FileName = "logs-";
+    options.FileSizeLimit = 50 * 1024;
+    options.RetainedFileCountLimit = 7;
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
