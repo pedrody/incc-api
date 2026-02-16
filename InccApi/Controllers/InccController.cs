@@ -28,6 +28,11 @@ public class InccController : ControllerBase
     {
         var entries = await _inccRepository.GetPaginatedAsync(paginationParams);
 
+        if (entries == null || !entries.Any())
+        {
+            return NotFound();
+        }
+
         Response.AddPaginationHeader(
             entries.CurrentPage, 
             entries.PageSize, 
