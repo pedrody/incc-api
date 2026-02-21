@@ -17,6 +17,17 @@ builder.Services.Configure<AzureFileLoggerOptions>(options =>
     options.RetainedFileCountLimit = 7;
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .SetPreflightMaxAge(TimeSpan.FromHours(1));
+    });
+});
+
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -41,6 +52,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors();
 
 app.UseAuthorization();
 
