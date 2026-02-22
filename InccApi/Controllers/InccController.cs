@@ -5,10 +5,12 @@ using InccApi.Pagination;
 using InccApi.Repositories;
 using InccApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace InccApi.Controllers;
 
 
+[EnableRateLimiting("per-user")]
 [Route("api/[controller]")]
 [ApiController]
 public class InccController : ControllerBase
