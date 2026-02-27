@@ -112,14 +112,24 @@ public class InccController : ControllerBase
     {
         if (!@params.IsValid())
         {
-            return BadRequest("A data inicial não pode ser superior à final");
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Invalid date range",
+                Detail = "Start date can't be greater than end date",
+                Status = StatusCodes.Status400BadRequest
+            });
         }
 
         var accumulatedDto = await _inccService.AccumulatedVariationAsync(@params);
 
         if (accumulatedDto == null)
         {
-            return NotFound();
+            return NotFound(new ProblemDetails
+            {
+                Title = "No entries found",
+                Detail = "No entries found for the specified range",
+                Status = StatusCodes.Status404NotFound
+            });
         }
 
         return Ok(accumulatedDto);
