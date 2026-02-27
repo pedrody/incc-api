@@ -47,14 +47,19 @@ public class InccController : ControllerBase
         return Ok(entries.ToDtoList());
     }
 
-    [HttpGet("{year:int:range(1995,2100)}/{month:int:range(1,12)}")]
+    [HttpGet("{year:int:range(1994,2026)}/{month:int:range(1,12)}")]
     public async Task<ActionResult<InccResponseDTO>> Get(int year, int month)
     {
         var inccEntry = await _inccRepository.GetByDateAsync(year, month);
 
         if (inccEntry is null)
         {
-            return NotFound();
+            return NotFound(new ProblemDetails
+            {
+                Title = "Entry not found",
+                Detail = $"No entry found for {month}/{year}",
+                Status = StatusCodes.Status404NotFound
+            });
         }
 
         var inccEntryResponseDto = inccEntry.ToDto();
