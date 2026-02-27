@@ -67,23 +67,27 @@ public class InccController : ControllerBase
         [FromQuery] InccRangeParams @params)
     {
         var start = @params.GetStartDate();
-
-        if (start == null)
-        {
-            return BadRequest("Data inicial inválida");
-        }
+        var end = @params.GetEndDate();
 
         if (!@params.IsValid())
         {
-            return BadRequest("A data inicial não pode ser superior à final.");
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Invalid date range",
+                Detail = "Start date can't be greater than end date",
+                Status = StatusCodes.Status400BadRequest
+            });
         }
 
-        var entries = await _inccRepository.GetRangeAsync(@params, start.Value, @params.GetEndDate());
+        var entries = await _inccRepository.GetRangeAsync(@params, start, end);
 
         if (entries == null || !entries.Any())
-        {
-            return NotFound();
-        }
+            return NotFound(new ProblemDetails
+            {
+                Title = "No entries found",
+                Detail = "No entries found for the specified range",
+                Status = StatusCodes.Status404NotFound
+            });
 
         Response.AddPaginationHeader(
             entries.CurrentPage,

@@ -5,39 +5,27 @@ namespace InccApi.DTOs;
 
 public class InccRangeParams : PaginationParams
 {
-    [Required(ErrorMessage = "Necessário informar o ano de início")]
-    [Range(1995, 2100)]
+    [Required]
+    [Range(1994, 2026)]
     public int? StartYear { get; set; }
 
-    [Required(ErrorMessage = "Necessário informar o mês de início")]
-    [Range(1, 12, ErrorMessage = "O mês deve estar entre 1 e 12.")]
+    [Required]
+    [Range(1, 12)]
     public int? StartMonth { get; set; }
 
-    [Range(1995, 2100)]
+    [Range(1994, 2026)]
     public int? EndYear { get; set; }
 
-    [Range(1, 12, ErrorMessage = "O mês deve estar entre 1 e 12.")]
+    [Range(1, 12)]
     public int? EndMonth { get; set; }
-
     
-    public DateTime? GetStartDate()
-    {
-        if (!StartYear.HasValue)
-        {
-            return null;
-        }
-
-        int month = StartMonth ?? 1;
-
-        return new DateTime(StartYear.Value, month, 1);
-    }
+    public DateTime GetStartDate() => new(
+        StartYear.Value, StartMonth.Value, 1);
 
     public DateTime? GetEndDate()
     {
         if (!EndYear.HasValue)
-        {
             return null;
-        }
 
         int month = EndMonth ?? 12;
 
@@ -49,10 +37,8 @@ public class InccRangeParams : PaginationParams
         var start = GetStartDate();
         var end = GetEndDate();
 
-        if (start == null || end == null)
-        {
+        if (end == null)
             return true;
-        }
 
         return start <= end;
     }
