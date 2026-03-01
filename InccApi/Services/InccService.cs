@@ -23,18 +23,18 @@ public class InccService : IInccService
             return null;
         }
 
-        var accumulated = ((double)inccEnd.Value / (double)inccStart.Value - 1) * 100;
+        var accumulated = (inccEnd.Value / inccStart.Value - 1) * 100;
         
         decimal? adjustedValue = null;
         if (@params.Amount.HasValue)
         {
-            decimal factor = 1 + ((decimal)accumulated / 100);
+            decimal factor = 1 + (accumulated / 100);
             adjustedValue = Math.Round(@params.Amount.Value * factor, 4);
         }
 
         return new InccAccumulatedResponseDTO
         {
-            AccumulatedVariation = Math.Round(accumulated, 4),
+            AccumulatedVariation = (double)Math.Round(accumulated, 4),
             AdjustedValue = adjustedValue,
             StartDate = inccStart.ReferenceDate.ToString("MM/yyyy"),
             EndDate = inccEnd.ReferenceDate.ToString("MM/yyyy")
