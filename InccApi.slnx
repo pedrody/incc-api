@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="InccApi.UnitTests/InccApi.UnitTests.csproj" Id="e5f7bc76-eeb9-432f-b32f-64d520785541" />
   <Project Path="InccApi/InccApi.csproj" />
 </Solution>
