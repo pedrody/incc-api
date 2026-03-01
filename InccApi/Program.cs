@@ -95,6 +95,9 @@ builder.Services.AddRateLimiter(options =>
     };
 });
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddScoped<IInccRepository, InccRepository>();
 builder.Services.AddScoped<IInccService, InccService>();
 
@@ -102,7 +105,7 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-app.UseMiddleware<ExceptionHandlerMiddleware>();
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
