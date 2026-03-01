@@ -159,7 +159,8 @@ public class InccController : ControllerBase
     /// <param name="params">Datas de início e fim para o cálculo.</param>
     /// <returns>Variação acumulada e valor ajustado para o período.</returns>
     /// <response code="200">Retorna a variação acumulada e valor ajustado.</response>
-    /// <response code="400">O intervalo de datas fornecido é inválido.</response>
+    /// <response code="400">O intervalo de datas fornecido é inválido ou 
+    /// o valor do INCC inicial é igual a zero.</response>
     /// <response code="404">Nenhum índice encontrado para o intervalo 
     /// especificado.</response>
     [HttpGet("accumulated")]
@@ -180,7 +181,20 @@ public class InccController : ControllerBase
             });
         }
 
-        var accumulatedDto = await _inccService.AccumulatedVariationAsync(@params);
+        InccAccumulatedResponseDTO? accumulatedDto;
+        try
+        {
+            accumulatedDto = await _inccService.AccumulatedVariationAsync(@params);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Calculation Error",
+                Detail = ex.Message,
+                Status = StatusCodes.Status400BadRequest
+            });
+        }
 
         if (accumulatedDto == null)
         {

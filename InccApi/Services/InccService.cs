@@ -19,9 +19,10 @@ public class InccService : IInccService
         var inccEnd = await _inccRepository.GetByDateAsync(@params.EndYear, @params.EndMonth);
 
         if (inccStart == null || inccEnd == null)
-        {
             return null;
-        }
+
+        if (inccStart.Value == 0)
+            throw new ArgumentException("The initial INCC value cannot be zero.");
 
         var accumulated = (inccEnd.Value / inccStart.Value - 1) * 100;
         

@@ -132,4 +132,36 @@ public class InccServiceTests
         Assert.NotNull(result);
         Assert.Null(result.AdjustedValue);
     }
+
+    [Fact]
+    public async Task AccumulatedVariationAsync_Should_ThrowArgumentException_WhenStartValueIsZero()
+    {
+        // Arrange
+        var paramsDto = new InccAccumulatedParams
+        {
+            Amount = 1000,
+            StartYear = 2023,
+            StartMonth = 1,
+            EndYear = 2023,
+            EndMonth = 2
+        };
+
+        _inccRepositoryMock.GetByDateAsync(paramsDto.StartYear, paramsDto.StartMonth)
+            .Returns(new InccEntry
+            {
+                Value = 0
+            });
+        _inccRepositoryMock.GetByDateAsync(paramsDto.EndYear, paramsDto.EndMonth)
+            .Returns(new InccEntry
+            {
+                Value = 100.0m,
+                ReferenceDate = new DateTime(2023, 2, 1),
+            });
+
+        // Act and Assert
+        var exception = await Assert.ThrowsAsync<ArgumentException>(() => 
+                _inccService.AccumulatedVariationAsync(paramsDto));
+
+        Assert.Equal("The initial INCC value cannot be zero.", exception.Message);
+    }
 }
