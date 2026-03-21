@@ -2,7 +2,7 @@
 
 namespace InccApi.DTOs;
 
-public class InccAccumulatedParams
+public class InccAccumulatedParams : IValidatableObject
 {
     public decimal? Amount { get; set;  }
 
@@ -26,11 +26,19 @@ public class InccAccumulatedParams
 
     public DateTime GetEndDate() => new(EndYear, EndMonth, 1);
 
-    public bool IsValid()
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        var start = GetStartDate();
-        var end = GetEndDate();
-
-        return start <= end;
+        if (GetStartDate() > GetEndDate())
+        {
+            yield return new ValidationResult(
+                "Start date can't be greater than end date",
+                new[]
+                {
+                    nameof(StartMonth),
+                    nameof(StartYear),
+                    nameof(EndMonth),
+                    nameof(EndYear)
+                });
+        }
     }
 }

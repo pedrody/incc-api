@@ -121,16 +121,6 @@ public class InccController : ControllerBase
         var start = @params.GetStartDate();
         var end = @params.GetEndDate();
 
-        if (!@params.IsValid())
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Invalid date range",
-                Detail = "Start date can't be greater than end date",
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-
         var entries = await _inccRepository.GetRangeAsync(@params, start, end);
 
         if (entries == null || !entries.Any())
@@ -171,16 +161,6 @@ public class InccController : ControllerBase
     public async Task<ActionResult<InccAccumulatedResponseDTO>> Get(
         [FromQuery] InccAccumulatedParams @params)
     {
-        if (!@params.IsValid())
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Invalid date range",
-                Detail = "Start date can't be greater than end date",
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-
         InccAccumulatedResponseDTO? accumulatedDto;
         try
         {
