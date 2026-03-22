@@ -43,7 +43,7 @@ public class InccController : ControllerBase
     {
         var entries = await _inccRepository.GetPaginatedAsync(paginationParams);
 
-        if (entries == null || !entries.Any())
+        if (entries == null || !entries.Items.Any())
         {
             return NotFound(new ProblemDetails
             {
@@ -62,7 +62,7 @@ public class InccController : ControllerBase
             entries.HasPrevious
         );
 
-        return Ok(entries.ToDtoList());
+        return Ok(entries.Items.ToDtoList());
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ public class InccController : ControllerBase
 
         var entries = await _inccRepository.GetRangeAsync(@params, start, end);
 
-        if (entries == null || !entries.Any())
+        if (entries == null || !entries.Items.Any())
             return NotFound(new ProblemDetails
             {
                 Title = "No entries found",
@@ -140,7 +140,7 @@ public class InccController : ControllerBase
             entries.HasPrevious
         );
 
-        return Ok(entries.ToDtoList());
+        return Ok(entries.Items.ToDtoList());
     }
 
     /// <summary>
