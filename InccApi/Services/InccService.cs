@@ -48,7 +48,7 @@ public class InccService : IInccService
     {
         var entry = await _inccRepository.GetByDateAsync(year, month);
 
-        return entry.ToDto();
+        return entry?.ToDto();
     }
 
     public async Task<PagedList<InccResponseDTO>> GetPaginatedAsync(PaginationParams paginationParams)

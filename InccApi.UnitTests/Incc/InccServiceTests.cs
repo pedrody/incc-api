@@ -164,4 +164,42 @@ public class InccServiceTests
 
         Assert.Equal("The initial INCC value cannot be zero.", exception.Message);
     }
+
+    [Fact]
+    public async Task GetByDateAsync_Should_ReturnDto_When_EntryExists()
+    {
+        // Arrange
+        var year = 2025;
+        var month = 1;
+        var entry = new InccEntry
+        {
+            ReferenceDate = new DateTime(year, month, 1),
+            Value = 100.0m,
+            MonthlyVariation = 0.5
+        };
+
+        _inccRepositoryMock.GetByDateAsync(year, month).Returns(entry);
+
+        // Act
+        var result = await _inccService.GetByDateAsync(year, month);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("01/2025", result.MonthYear);
+        Assert.Equal(100.0m, result.Value);
+    }
+
+    [Fact]
+    public async Task GetByDateAsync_Should_ReturnNull_When_EntryDoesNotExist()
+    {
+        // Arrange
+        _inccRepositoryMock.GetByDateAsync(Arg.Any<int>(), Arg.Any<int>())
+                            .Returns(Task.FromResult<InccEntry>(null));
+        
+        // Act
+        var result = await _inccService.GetByDateAsync(1, 1);
+
+        // Assert
+        Assert.Null(result);
+    }
 }
