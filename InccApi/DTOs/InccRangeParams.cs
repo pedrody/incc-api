@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace InccApi.DTOs;
 
-public class InccRangeParams : PaginationParams
+public class InccRangeParams : PaginationParams, IValidatableObject
 {
     [Required]
     [Range(1994, 2026)]
@@ -32,14 +32,18 @@ public class InccRangeParams : PaginationParams
         return new DateTime(EndYear.Value, month, 1);
     }
 
-    public bool IsValid()
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        var start = GetStartDate();
-        var end = GetEndDate();
-
-        if (end == null)
-            return true;
-
-        return start <= end;
+        if (GetEndDate() != null && GetStartDate() > GetEndDate())
+        {
+            yield return new ValidationResult(
+                "Start date can't be greater than end date",
+                new[] { 
+                    nameof(StartMonth), 
+                    nameof(StartYear),
+                    nameof(EndMonth),
+                    nameof(EndYear) 
+                });
+        }
     }
 }

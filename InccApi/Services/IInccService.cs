@@ -1,9 +1,13 @@
 ﻿using InccApi.DTOs;
+using InccApi.Pagination;
 
 namespace InccApi.Services;
 
 public interface IInccService
 {
-    public Task<InccAccumulatedResponseDTO?> AccumulatedVariationAsync(
+    Task<PagedList<InccResponseDTO>> GetPaginatedAsync(PaginationParams paginationParams);
+    Task<InccResponseDTO?> GetByDateAsync(int year, int month);
+    Task<PagedList<InccResponseDTO>> GetRangeAsync(InccRangeParams @params);
+    Task<InccAccumulatedResponseDTO?> AccumulatedVariationAsync(
         InccAccumulatedParams @params);
 }

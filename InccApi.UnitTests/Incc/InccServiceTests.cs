@@ -1,5 +1,6 @@
 ﻿using InccApi.DTOs;
 using InccApi.Models;
+using InccApi.Pagination;
 using InccApi.Repositories;
 using InccApi.Services;
 using NSubstitute;
@@ -163,5 +164,141 @@ public class InccServiceTests
                 _inccService.AccumulatedVariationAsync(paramsDto));
 
         Assert.Equal("The initial INCC value cannot be zero.", exception.Message);
+    }
+
+    [Fact]
+    public async Task GetByDateAsync_Should_ReturnDto_When_EntryExists()
+    {
+        // Arrange
+        var year = 2025;
+        var month = 1;
+        var entry = new InccEntry
+        {
+            ReferenceDate = new DateTime(year, month, 1),
+            Value = 100.0m,
+            MonthlyVariation = 0.5
+        };
+
+        _inccRepositoryMock.GetByDateAsync(year, month).Returns(entry);
+
+        // Act
+        var result = await _inccService.GetByDateAsync(year, month);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("01/2025", result.MonthYear);
+        Assert.Equal(100.0m, result.Value);
+    }
+
+    [Fact]
+    public async Task GetByDateAsync_Should_ReturnNull_When_EntryDoesNotExist()
+    {
+        // Arrange
+        _inccRepositoryMock.GetByDateAsync(Arg.Any<int>(), Arg.Any<int>())
+                            .Returns(Task.FromResult<InccEntry>(null));
+        
+        // Act
+        var result = await _inccService.GetByDateAsync(1, 1);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetPaginatedAsync_Should_ReturnPagedDtos_WithCorrectMetadata()
+    {
+        // Arrange
+        var paginationParams = new PaginationParams { PageNumber = 1, PageSize = 5 };
+        var entries = new List<InccEntry>
+        {
+            new InccEntry { ReferenceDate = new DateTime(2023, 1, 1), Value = 100.0m },
+            new InccEntry { ReferenceDate = new DateTime(2024, 1, 1), Value = 200.0m },
+        };
+        var pagedEntries = new PagedList<InccEntry>(entries, 2, 1, 5);
+
+        _inccRepositoryMock.GetPaginatedAsync(paginationParams).Returns(pagedEntries);
+
+        // Act
+        var result = await _inccService.GetPaginatedAsync(paginationParams);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(2, result.TotalCount);
+        Assert.Equal(2, result.Items.Count());
+        Assert.IsType<InccResponseDTO>(result.Items.First());
+        Assert.Equal(100.0m, result.Items.First().Value);
+    }
+
+    [Fact]
+    public async Task GetPaginatedAsync_Should_ReturnEmptyPagedList_IfNoEntriesFound()
+    {
+        // Arrange
+        var paginationParams = new PaginationParams();
+        var emptyPagedList = new PagedList<InccEntry>(new List<InccEntry>(), 0, 1, 10);
+
+        _inccRepositoryMock.GetPaginatedAsync(paginationParams).Returns(emptyPagedList);
+
+        // Act
+        var result = await _inccService.GetPaginatedAsync(paginationParams);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result.Items);
+        Assert.Equal(0, result.TotalCount);
+    }
+
+    [Fact]
+    public async Task GetRangeAsync_Should_ReturnPagedDtos_WithCorrectMetadata()
+    {
+        // Arrange
+        var rangeParams = new InccRangeParams
+        {
+            StartYear = 2025,
+            StartMonth = 1
+        };
+
+        var entries = new List<InccEntry>
+        {
+            new InccEntry { ReferenceDate = new DateTime(2023, 1, 1), Value = 100.0m },
+            new InccEntry { ReferenceDate = new DateTime(2024, 1, 1), Value = 200.0m },
+        };
+
+        var pagedList = new PagedList<InccEntry>(entries, 2, 1, 10);
+
+        _inccRepositoryMock.GetRangeAsync(rangeParams, Arg.Any<DateTime>(), Arg.Any<DateTime?>())
+            .Returns(pagedList);
+
+        // Act
+        var result = await _inccService.GetRangeAsync(rangeParams);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(2, result.TotalCount);
+        Assert.Equal(2, result.Items.Count());
+        Assert.IsType<InccResponseDTO>(result.Items.First());
+        Assert.Equal(100.0m, result.Items.First().Value);
+    }
+
+    [Fact]
+    public async Task GetRangeAsync_Should_ReturnEmptyPagedList_IfNoEntriesFound()
+    {
+        // Arrange
+        var rangeParams = new InccRangeParams
+        {
+            StartYear = 2025,
+            StartMonth = 1
+        };
+        var emptyPagedList = new PagedList<InccEntry>(new List<InccEntry>(), 0, 1, 10);
+
+        _inccRepositoryMock.GetRangeAsync(rangeParams, Arg.Any<DateTime>(), Arg.Any<DateTime?>())
+            .Returns(emptyPagedList);
+
+        // Act
+        var result = await _inccService.GetRangeAsync(rangeParams);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result.Items);
+        Assert.Equal(0, result.TotalCount);
     }
 }

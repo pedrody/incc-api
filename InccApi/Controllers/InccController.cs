@@ -1,8 +1,6 @@
 ﻿using InccApi.DTOs;
-using InccApi.DTOs.Mappings;
 using InccApi.Extensions;
 using InccApi.Pagination;
-using InccApi.Repositories;
 using InccApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -15,12 +13,10 @@ namespace InccApi.Controllers;
 [ApiController]
 public class InccController : ControllerBase
 {
-    private readonly IInccRepository _inccRepository;
     private readonly IInccService _inccService;
 
-    public InccController(IInccRepository inccRepository, IInccService inccService)
+    public InccController(IInccService inccService)
     {
-        _inccRepository = inccRepository;
         _inccService = inccService;
     }
 
@@ -41,9 +37,9 @@ public class InccController : ControllerBase
     public async Task<ActionResult<IEnumerable<InccResponseDTO>>> GetPaginated(
         [FromQuery] PaginationParams paginationParams)
     {
-        var entries = await _inccRepository.GetPaginatedAsync(paginationParams);
+        var entries = await _inccService.GetPaginatedAsync(paginationParams);
 
-        if (entries == null || !entries.Any())
+        if (!entries.Items.Any())
         {
             return NotFound(new ProblemDetails
             {
@@ -62,7 +58,7 @@ public class InccController : ControllerBase
             entries.HasPrevious
         );
 
-        return Ok(entries.ToDtoList());
+        return Ok(entries.Items);
     }
 
     /// <summary>
@@ -83,9 +79,9 @@ public class InccController : ControllerBase
     [ProducesDefaultResponseType]
     public async Task<ActionResult<InccResponseDTO>> Get(int year, int month)
     {
-        var inccEntry = await _inccRepository.GetByDateAsync(year, month);
+        var entry = await _inccService.GetByDateAsync(year, month);
 
-        if (inccEntry is null)
+        if (entry is null)
         {
             return NotFound(new ProblemDetails
             {
@@ -95,9 +91,7 @@ public class InccController : ControllerBase
             });
         }
 
-        var inccEntryResponseDto = inccEntry.ToDto();
-
-        return Ok(inccEntryResponseDto);
+        return Ok(entry);
     }
 
     /// <summary>
@@ -118,22 +112,9 @@ public class InccController : ControllerBase
     public async Task<ActionResult<IEnumerable<InccResponseDTO>>> Get(
         [FromQuery] InccRangeParams @params)
     {
-        var start = @params.GetStartDate();
-        var end = @params.GetEndDate();
+        var entries = await _inccService.GetRangeAsync(@params);
 
-        if (!@params.IsValid())
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Invalid date range",
-                Detail = "Start date can't be greater than end date",
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-
-        var entries = await _inccRepository.GetRangeAsync(@params, start, end);
-
-        if (entries == null || !entries.Any())
+        if (!entries.Items.Any())
             return NotFound(new ProblemDetails
             {
                 Title = "No entries found",
@@ -150,7 +131,7 @@ public class InccController : ControllerBase
             entries.HasPrevious
         );
 
-        return Ok(entries.ToDtoList());
+        return Ok(entries.Items);
     }
 
     /// <summary>
@@ -171,16 +152,6 @@ public class InccController : ControllerBase
     public async Task<ActionResult<InccAccumulatedResponseDTO>> Get(
         [FromQuery] InccAccumulatedParams @params)
     {
-        if (!@params.IsValid())
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Invalid date range",
-                Detail = "Start date can't be greater than end date",
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-
         InccAccumulatedResponseDTO? accumulatedDto;
         try
         {
