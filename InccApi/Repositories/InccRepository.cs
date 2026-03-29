@@ -44,4 +44,13 @@ public class InccRepository : IInccRepository
         return await PagedList<InccEntry>.ToPagedListAsync(query.OrderBy(e => e.ReferenceDate), 
                                                            @params.PageNumber, @params.PageSize);
     }
+
+    public async Task<InccEntry> Create(InccEntry entry)
+    {
+        _context.InccEntries.Add(entry);
+
+        await _context.SaveChangesAsync();
+
+        return entry;
+    }
 }
