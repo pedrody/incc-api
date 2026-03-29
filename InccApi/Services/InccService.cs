@@ -48,7 +48,7 @@ public class InccService : IInccService
     {
         var entry = await _inccRepository.GetByDateAsync(year, month);
 
-        return entry?.ToDto();
+        return entry?.ToResponseDto();
     }
 
     public async Task<PagedList<InccResponseDTO>> GetPaginatedAsync(PaginationParams paginationParams)
@@ -56,7 +56,7 @@ public class InccService : IInccService
         var entries = await _inccRepository.GetPaginatedAsync(paginationParams);
 
         return new PagedList<InccResponseDTO>(
-                entries.Items.ToDtoList(),
+                entries.Items.ToResponseDtoList(),
                 entries.TotalCount,
                 entries.CurrentPage,
                 entries.PageSize
@@ -71,10 +71,29 @@ public class InccService : IInccService
         var entries = await _inccRepository.GetRangeAsync(@params, startDate, endDate);
 
         return new PagedList<InccResponseDTO>(
-                entries.Items.ToDtoList(),
+                entries.Items.ToResponseDtoList(),
                 entries.TotalCount,
                 entries.CurrentPage,
                 entries.PageSize
             );
+    }
+
+    public async Task<InccResponseDTO?> Create(InccCreateDto createEntry)
+    {
+        var normalizedDate = new DateTime(createEntry.ReferenceDate.Year,
+            createEntry.ReferenceDate.Month, 1);
+        
+        if (await _inccRepository.GetByDateAsync(normalizedDate.Year, 
+            normalizedDate.Month) != null)
+        {
+            return null;
+        }
+
+        var inccEntry = createEntry.ToInccEntry();
+        inccEntry.ReferenceDate = normalizedDate;
+
+        var inccEntryDb = await _inccRepository.Create(inccEntry);
+
+        return inccEntryDb.ToResponseDto();
     }
 }
