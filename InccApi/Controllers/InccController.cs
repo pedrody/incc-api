@@ -179,4 +179,29 @@ public class InccController : ControllerBase
 
         return Ok(accumulatedDto);
     }
+
+    [HttpPost]
+    public async Task<ActionResult<InccResponseDTO>> Post(InccCreateDto createEntry)
+    {
+        var responseEntry = await _inccService.Create(createEntry);
+
+        if (responseEntry is null)
+        {
+            return Conflict(new ProblemDetails
+            {
+                Title = "Entry already exists",
+                Detail = $"An entry for {createEntry.ReferenceDate:MM/yyyy} already exists",
+                Status = StatusCodes.Status409Conflict
+            });
+        }
+
+        return CreatedAtAction(
+            nameof(Get),
+            new
+            {
+                month = createEntry.ReferenceDate.Month,
+                year = createEntry.ReferenceDate.Year
+            },
+            responseEntry);
+    }
 }
