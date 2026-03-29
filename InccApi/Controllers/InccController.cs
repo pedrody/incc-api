@@ -1,4 +1,5 @@
-﻿using InccApi.DTOs;
+﻿using InccApi.Authentication;
+using InccApi.DTOs;
 using InccApi.Extensions;
 using InccApi.Pagination;
 using InccApi.Services;
@@ -181,6 +182,7 @@ public class InccController : ControllerBase
     }
 
     [HttpPost]
+    [ApiKey]
     public async Task<ActionResult<InccResponseDTO>> Post(InccCreateDto createEntry)
     {
         var responseEntry = await _inccService.Create(createEntry);
