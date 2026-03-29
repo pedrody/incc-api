@@ -2,7 +2,7 @@
 
 namespace InccApi.DTOs.Mappings;
 
-public static class InccDTOExtesions
+public static class InccDTOExtensions
 {
     public static IEnumerable<InccResponseDTO> ToDtoList(this IEnumerable<InccEntry> inccEntries)
     {
