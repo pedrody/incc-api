@@ -4,12 +4,12 @@ namespace InccApi.DTOs.Mappings;
 
 public static class InccDTOExtensions
 {
-    public static IEnumerable<InccResponseDTO> ToDtoList(this IEnumerable<InccEntry> inccEntries)
+    public static IEnumerable<InccResponseDTO> ToResponseDtoList(this IEnumerable<InccEntry> inccEntries)
     {
-        return inccEntries.Select(e => e.ToDto()).ToList();
+        return inccEntries.Select(e => e.ToResponseDto()).ToList();
     }
 
-    public static InccResponseDTO ToDto(this InccEntry inccEntry)
+    public static InccResponseDTO ToResponseDto(this InccEntry inccEntry)
     {
         return new InccResponseDTO
         {
