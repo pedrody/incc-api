@@ -18,4 +18,14 @@ public static class InccDTOExtensions
             MonthlyVariation = inccEntry.MonthlyVariation
         };
     }
+
+    public static InccEntry ToInccEntry(this InccCreateDto createDto)
+    {
+        return new InccEntry
+        {
+            ReferenceDate = createDto.ReferenceDate,
+            Value = createDto.Value,
+            MonthlyVariation = createDto.MonthlyVariation
+        };
+    }
 }
