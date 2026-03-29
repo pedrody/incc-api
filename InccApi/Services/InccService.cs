@@ -80,8 +80,10 @@ public class InccService : IInccService
 
     public async Task<InccResponseDTO?> Create(InccCreateDto createEntry)
     {
-        var normalizedDate = new DateTime(createEntry.ReferenceDate.Year,
-            createEntry.ReferenceDate.Month, 1);
+        var normalizedDate = new DateTime(
+            createEntry.ReferenceDate!.Value.Year,
+            createEntry.ReferenceDate!.Value.Month, 
+            1);
         
         if (await _inccRepository.GetByDateAsync(normalizedDate.Year, 
             normalizedDate.Month) != null)

@@ -201,8 +201,8 @@ public class InccController : ControllerBase
             nameof(Get),
             new
             {
-                month = createEntry.ReferenceDate.Month,
-                year = createEntry.ReferenceDate.Year
+                month = createEntry.ReferenceDate!.Value.Month,
+                year = createEntry.ReferenceDate!.Value.Year
             },
             responseEntry);
     }

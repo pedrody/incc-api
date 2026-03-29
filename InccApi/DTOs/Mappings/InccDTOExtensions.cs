@@ -23,9 +23,9 @@ public static class InccDTOExtensions
     {
         return new InccEntry
         {
-            ReferenceDate = createDto.ReferenceDate,
-            Value = createDto.Value,
-            MonthlyVariation = createDto.MonthlyVariation
+            ReferenceDate = createDto.ReferenceDate!.Value,
+            Value = createDto.Value!.Value,
+            MonthlyVariation = createDto.MonthlyVariation!.Value
         };
     }
 }
