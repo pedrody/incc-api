@@ -1,4 +1,5 @@
-﻿using InccApi.DTOs;
+﻿using InccApi.Authentication;
+using InccApi.DTOs;
 using InccApi.Extensions;
 using InccApi.Pagination;
 using InccApi.Services;
@@ -178,5 +179,42 @@ public class InccController : ControllerBase
         }
 
         return Ok(accumulatedDto);
+    }
+
+
+    /// <summary>
+    /// Cria um novo registro do INCC-M.
+    /// </summary>
+    /// <param name="createEntry">Registro para ser criado</param>
+    /// <returns>O registro criado.</returns>
+    /// <response code="201">Retorna o registro criado.</response>
+    /// <response code="409">Já existe um registro para a data de referência.</response>
+    [HttpPost]
+    [ApiKey]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesDefaultResponseType]
+    public async Task<ActionResult<InccResponseDTO>> Post(InccCreateDto createEntry)
+    {
+        var responseEntry = await _inccService.Create(createEntry);
+
+        if (responseEntry is null)
+        {
+            return Conflict(new ProblemDetails
+            {
+                Title = "Entry already exists",
+                Detail = $"An entry for {createEntry.ReferenceDate:MM/yyyy} already exists",
+                Status = StatusCodes.Status409Conflict
+            });
+        }
+
+        return CreatedAtAction(
+            nameof(Get),
+            new
+            {
+                month = createEntry.ReferenceDate!.Value.Month,
+                year = createEntry.ReferenceDate!.Value.Year
+            },
+            responseEntry);
     }
 }

@@ -121,6 +121,7 @@ app.UseForwardedHeaders();
 
 app.UseRateLimiter();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
