@@ -301,4 +301,56 @@ public class InccServiceTests
         Assert.Empty(result.Items);
         Assert.Equal(0, result.TotalCount);
     }
+
+    [Fact]
+    public async Task CreateAsync_Should_NormalizeDateAndReturnDto_WhenEntryIsNew()
+    {
+        // Arrange
+        var inputDate = new DateTime(2026, 1, 15);
+        var expectedNormalizedDate = new DateTime(2026, 1, 1);
+
+        var entryCreateDto = new InccCreateDto
+        {
+            MonthlyVariation = 123,
+            ReferenceDate = inputDate,
+            Value = 456.78m,
+        };
+
+        _inccRepositoryMock.GetByDateAsync(2026, 1)
+            .Returns(Task.FromResult<InccEntry?>(null));
+
+        _inccRepositoryMock.CreateAsync(Arg.Any<InccEntry>())
+            .Returns(args => (InccEntry)args[0]);
+
+        // Act
+        var result = await _inccService.CreateAsync(entryCreateDto);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.IsType<InccResponseDTO>(result);
+        Assert.Equal(456.78m, result.Value);
+        Assert.Equal("01/2026", result.MonthYear);
+
+        await _inccRepositoryMock.Received(1).CreateAsync(Arg.Is<InccEntry>(e => 
+            e.ReferenceDate == expectedNormalizedDate && e.Value == 456.78m));
+    }
+
+    [Fact]
+    public async Task CreateAsync_Should_ReturnNull_WhenEntryAlreadyExists()
+    {
+        // Arrange
+        var entryCreateDto = new InccCreateDto
+        {
+           ReferenceDate = new DateTime(2026, 1, 1),
+        };
+
+        _inccRepositoryMock.GetByDateAsync(2026, 1)
+            .Returns(new InccEntry());
+
+        // Act
+        var result = await _inccService.CreateAsync(entryCreateDto);
+
+        // Assert
+        Assert.Null(result);
+    }
 }
