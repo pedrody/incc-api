@@ -78,7 +78,7 @@ public class InccService : IInccService
             );
     }
 
-    public async Task<InccResponseDTO?> Create(InccCreateDto createEntry)
+    public async Task<InccResponseDTO?> CreateAsync(InccCreateDto createEntry)
     {
         var normalizedDate = new DateTime(
             createEntry.ReferenceDate!.Value.Year,
@@ -94,7 +94,7 @@ public class InccService : IInccService
         var inccEntry = createEntry.ToInccEntry();
         inccEntry.ReferenceDate = normalizedDate;
 
-        var inccEntryDb = await _inccRepository.Create(inccEntry);
+        var inccEntryDb = await _inccRepository.CreateAsync(inccEntry);
 
         return inccEntryDb.ToResponseDto();
     }

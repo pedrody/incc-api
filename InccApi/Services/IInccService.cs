@@ -10,5 +10,5 @@ public interface IInccService
     Task<PagedList<InccResponseDTO>> GetRangeAsync(InccRangeParams @params);
     Task<InccAccumulatedResponseDTO?> AccumulatedVariationAsync(
         InccAccumulatedParams @params);
-    Task<InccResponseDTO?> Create(InccCreateDto entry);
+    Task<InccResponseDTO?> CreateAsync(InccCreateDto entry);
 }

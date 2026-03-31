@@ -196,7 +196,7 @@ public class InccController : ControllerBase
     [ProducesDefaultResponseType]
     public async Task<ActionResult<InccResponseDTO>> Post(InccCreateDto createEntry)
     {
-        var responseEntry = await _inccService.Create(createEntry);
+        var responseEntry = await _inccService.CreateAsync(createEntry);
 
         if (responseEntry is null)
         {

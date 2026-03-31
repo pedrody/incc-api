@@ -45,7 +45,7 @@ public class InccRepository : IInccRepository
                                                            @params.PageNumber, @params.PageSize);
     }
 
-    public async Task<InccEntry> Create(InccEntry entry)
+    public async Task<InccEntry> CreateAsync(InccEntry entry)
     {
         _context.InccEntries.Add(entry);
 

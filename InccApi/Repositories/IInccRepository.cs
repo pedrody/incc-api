@@ -9,5 +9,5 @@ public interface IInccRepository
     Task<InccEntry?> GetByDateAsync(int year, int month);
     Task<PagedList<InccEntry>> GetRangeAsync(PaginationParams @params, 
                                              DateTime startDate, DateTime? endDate);
-    Task<InccEntry> Create(InccEntry entry);
+    Task<InccEntry> CreateAsync(InccEntry entry);
 }
