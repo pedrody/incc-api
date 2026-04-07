@@ -1,0 +1,21 @@
+name: incc_containers
+
+services:
+  incc.api:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file:
+      - .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+    networks:
+      - incc_network
+    ports:
+      - 8080:8080
+
+networks:
+  incc_network:
+    driver: bridge
